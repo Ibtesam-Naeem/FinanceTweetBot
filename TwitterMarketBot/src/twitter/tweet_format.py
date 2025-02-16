@@ -192,3 +192,36 @@ def fear_sentiment(greed_list):
 
     return tweet.strip()
 
+def daily_market_summary(market_data):
+    """
+    Formats a tweet for the daily closing
+    prices of S&P 500 and Dow Jones.
+    """
+    if not market_data:
+        return "Market data unavailable for today."
+
+    sp500 = market_data.get("S&P 500", {})
+    dow = market_data.get("Dow Jones", {})
+
+    tweet = "As of closing, the S&P 500 finished "
+    tweet += f"{sp500.get('Direction', 'unchanged')} {sp500.get('Percent Change', 'N/A')}% at ${sp500.get('Close', 'N/A')}.\n"
+    tweet += f"The Dow Jones ended {dow.get('Direction', 'unchanged')} {dow.get('Percent Change', 'N/A')}% at ${dow.get('Close', 'N/A')}."
+
+    return tweet.strip()
+
+def weekly_market_summary(weekly_data):
+    """
+    Formats a tweet for the weekly closing
+    summary of S&P 500 and Dow Jones.
+    """
+    if not weekly_data:
+        return "Weekly market data unavailable."
+
+    sp500 = weekly_data.get("S&P 500", {})
+    dow = weekly_data.get("Dow Jones", {})
+
+    tweet = "For the week, the S&P 500 moved "
+    tweet += f"{sp500.get('Weekly Direction', 'unchanged')} {sp500.get('Weekly Percent Change', 'N/A')}%, closing at ${sp500.get('Friday Close', 'N/A')}.\n"
+    tweet += f"The Dow Jones finished the week {dow.get('Weekly Direction', 'unchanged')} {dow.get('Weekly Percent Change', 'N/A')}%, ending at ${dow.get('Friday Close', 'N/A')}."
+
+    return tweet.strip()

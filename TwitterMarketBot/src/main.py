@@ -13,7 +13,7 @@ from scraping.econ_scraper import (
 )
 from scraping.market_movers import open_premarket_page, premarket_data_scraper
 from scraping.sentiment import fear_index
-
+from scraping.closing_prices import get_market_data, get_weekly_data
 from twitter.tweet_format import (
     daily_premkt_earnings_tweet,
     daily_afterhrs_earnings_tweet,
@@ -27,6 +27,8 @@ from twitter.tweet_format import (
     all_time_low,
     pre_market_gap,
     fear_sentiment,
+    daily_market_summary,
+    weekly_market_summary,
 )
 
 from config.logger import setup_logging
@@ -238,6 +240,34 @@ def post_fear_sentiment():
     else:
         logging.error("Failed to retrieve Fear & Greed Index data.")
 
+def post_daily_market_summary():
+    """
+    Fetches daily market data, formats the summary tweet,
+    and sends it.
+    Scheduled for 4:10 PM.
+    """
+    market_data = get_market_data()
+    
+    if market_data:
+        tweet = daily_market_summary(market_data)
+        send_tweet(tweet)
+    else:
+        logging.error("No market data available for daily summary.")
+
+def post_weekly_market_summary():
+    """
+    Fetches weekly market data, formats the summary tweet,
+    and sends it.
+    Scheduled for Friday 4:15 PM.
+    """
+    weekly_data = get_weekly_data()
+    
+    if weekly_data:
+        tweet = weekly_market_summary(weekly_data)
+        send_tweet(tweet)
+    else:
+        logging.error("No market data available for weekly summary.")
+
 
 if __name__ == "__main__":
     logging.info("Starting Twitter Bot Scheduler...")
@@ -254,7 +284,9 @@ if __name__ == "__main__":
     schedule.every().day.at("23:00").do(post_daily_econ_tweet)           # 11:00 PM
     schedule.every().day.at("22:00").do(post_weekly_econ_tweet)          # 10:00 PM
     schedule.every().hour.do(post_fear_sentiment)                        # every hour
-
+    schedule.every().day.at("16:05").do(post_daily_market_summary)
+    schedule.every().friday.at("16:20").do(post_weekly_market_summary)
+    
     while True:
         schedule.run_pending()
         time.sleep(30)
