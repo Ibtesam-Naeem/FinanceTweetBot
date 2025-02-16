@@ -232,7 +232,7 @@ def post_fear_sentiment():
     """
     fear_data = fear_index()
 
-    if fear_data:
+    if fear_data and len(fear_data) > 0:
         tweet = fear_sentiment(fear_data)
         send_tweet(tweet)
     else:
@@ -253,6 +253,7 @@ if __name__ == "__main__":
     schedule.every().day.at("15:51").do(post_all_time_low_tweet)         # 3:51 PM
     schedule.every().day.at("23:00").do(post_daily_econ_tweet)           # 11:00 PM
     schedule.every().day.at("22:00").do(post_weekly_econ_tweet)          # 10:00 PM
+    schedule.every().hour.do(post_fear_sentiment)                        # every hour
 
     while True:
         schedule.run_pending()
