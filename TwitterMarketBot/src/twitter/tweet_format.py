@@ -174,3 +174,20 @@ def kitty_posted(meme_list):
 
     return tweet.strip()
 
+def fear_sentiment(greed):
+    """
+    Formats a tweet for the Fear & Greed Index.
+    """
+    if not greed:
+        return "Not available"
+
+    category = greed.get("Category", "Unknown")
+    fear_value = greed.get("Fear Value", "N/A")
+
+    tweet = "🚨 The Fear & Greed Index has just entered new territory! 🚨\n"
+    tweet += f"Current Sentiment: {category}\n"
+    tweet += f"Fear & Greed Score: {fear_value}\n\n"
+    tweet += "How do you feel about the market? 📉📈"
+
+    return tweet.strip()
+

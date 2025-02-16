@@ -12,6 +12,8 @@ from scraping.econ_scraper import (
     scrape_economics_data,
 )
 from scraping.market_movers import open_premarket_page, premarket_data_scraper
+from scraping.sentiment import fear_index
+
 from twitter.tweet_format import (
     daily_premkt_earnings_tweet,
     daily_afterhrs_earnings_tweet,
@@ -24,7 +26,9 @@ from twitter.tweet_format import (
     all_time_high,
     all_time_low,
     pre_market_gap,
+    fear_sentiment,
 )
+
 from config.logger import setup_logging
 
 logging = setup_logging("TwitterBot")
@@ -221,6 +225,19 @@ def post_roaring_kitty_tweet():
     """
     Fetches and sends the roaring kitty tweet
     """
+
+def post_fear_sentiment():
+    """
+    Scrapes the Fear & Greed Index, formats a tweet, and posts it.
+    """
+    fear_data = fear_index()
+
+    if fear_data:
+        tweet = fear_sentiment(fear_data)
+        send_tweet(tweet)
+    else:
+        logging.error("Failed to retrieve Fear & Greed Index data.")
+
 
 if __name__ == "__main__":
     logging.info("Starting Twitter Bot Scheduler...")
