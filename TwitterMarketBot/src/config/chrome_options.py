@@ -18,7 +18,7 @@ def chrome_options():
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")  
     chrome_options.binary_location = os.getenv("CHROME_BINARY_PATH", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome")
-    
+    chrome_options.page_load_strategy = "eager"
     service = Service(executable_path='/usr/local/bin/chromedriver')
     
     return webdriver.Chrome(service=service, options=chrome_options)
