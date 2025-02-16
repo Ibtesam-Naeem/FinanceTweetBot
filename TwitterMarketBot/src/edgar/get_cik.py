@@ -12,7 +12,7 @@ def fetch_cik_for_tickers(tickers):
     from the SEC API.
     """
     url = "https://www.sec.gov/files/company_tickers.json"
-    headers = {"User-Agent": "MyScraper/1.0 (contact: ibtesamnaeemdev@gmail.com)"} 
+    headers = {'User-Agent': "ibtesamnaeemdev@gmail.com"}
     try:
         response = requests.get(url, headers=headers)
         data = response.json()

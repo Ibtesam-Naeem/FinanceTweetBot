@@ -15,7 +15,6 @@ This project automates the process of tweeting about earnings reports, economic 
       - $AAPL --->
         EPS estimate: $1.82  
         Revenue estimate: $100B  
-        Profit estimate: $20B  
       ```
   - **Economic Events:**
     - Example:
@@ -51,12 +50,10 @@ This project automates the process of tweeting about earnings reports, economic 
       - $MSFT --->
         EPS estimate: $2.85  
         Revenue estimate: $54B  
-        Profit estimate: $20B  
 
       - $AAPL --->
         EPS estimate: $1.82  
         Revenue estimate: $100B  
-        Profit estimate: $20B  
       ```
   - **Economic Events:**
     - Example:
@@ -80,9 +77,6 @@ This project automates the process of tweeting about earnings reports, economic 
     Revenue ---> Estimate: $100B  
     Reported: $97B ❌ MISS  
 
-    Profit ---> Estimate: $20B  
-    Reported: $21B ✅ BEAT  
-
     Guidance for the next quarter:  
     Revenue expected at $110B (higher than analyst expectations).  
     ```
@@ -100,7 +94,7 @@ This project automates the process of tweeting about earnings reports, economic 
 - **TradingView:**
   - Scrapes the **earnings calendar**, **economic calendar**, and **52-week highs/lows**.
 - **SEC EDGAR:**
-  - Scrapes detailed earnings reports (EPS, revenue, profit, guidance).
+  - Scrapes detailed earnings reports (EPS, revenue).
 - **Stock Price APIs:**
   - Fetches real-time stock prices for **52-week highs/lows** and **price reactions**.
 
