@@ -14,6 +14,7 @@ from scraping.econ_scraper import (
 from scraping.market_movers import open_premarket_page, premarket_data_scraper
 from scraping.sentiment import fear_index
 from scraping.closing_prices import get_market_data, get_weekly_data
+from scraping.general_info import trading_holidays
 from twitter.tweet_format import (
     daily_premkt_earnings_tweet,
     daily_afterhrs_earnings_tweet,
@@ -29,6 +30,7 @@ from twitter.tweet_format import (
     fear_sentiment,
     daily_market_summary,
     weekly_market_summary,
+    closures,
 )
 
 from config.logger import setup_logging
@@ -268,7 +270,19 @@ def post_weekly_market_summary():
     else:
         logging.error("No market data available for weekly summary.")
 
+def post_trading_holiday():
+    """
+    Fetches the trading holiday tweet and sends it
+    If holiday, post day prior at 8 PM
+    """
+    closing_dates = trading_holidays()
 
+    if closing_dates:
+        tweet = closures(closing_dates)
+        send_tweet()
+    else:
+        logging.error("No Holiday Tomorrow")
+        
 if __name__ == "__main__":
     logging.info("Starting Twitter Bot Scheduler...")
 

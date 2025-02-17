@@ -225,3 +225,15 @@ def weekly_market_summary(weekly_data):
     tweet += f"The Dow Jones finished the week {dow.get('Weekly Direction', 'unchanged')} {dow.get('Weekly Percent Change', 'N/A')}%, ending at ${dow.get('Friday Close', 'N/A')}."
 
     return tweet.strip()
+
+def closures(closing_dates):
+    """
+    Formats the Stock Market Closing dates tweet.
+    """
+    if not closing_dates:
+        return "Stock Market Open All Week"
+    
+    tweet = f"The Stock Market is closed tomorrow for {closing_dates}."
+
+    return tweet.strip()
+
