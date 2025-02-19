@@ -14,15 +14,14 @@ def earnings_to_be_tracked():
     of the week to the stocks being tracked.
     """
     return {
-        "Monday": ["MCD", "MNDY", "ON", "TSEM", "INCY", "ROK", "GCMG", "ALX", "NSP", "CNA",
-                   "ALAB", "FLNC", "VRTIX", "ACLS", "MEDP", "AMKR", "LSCC", "MITK", "INSP", "AWR"],
-        "Tuesday": ["SHOP", "KO", "HUM", "BP", "LDOS", "AN", "SPGI", "CG", "MAR",
-                    "SMCI", "SUPMERC", "UPST", "DASH", "LYFT", "FRSH", "FWKS", "ET", "GLD", "GILD", "CFLT"],
-        "Wednesday": ["VRT", "CVS", "ABNB", "BMO", "JLL", "BIDU", "WDAY", "ADBE", "DUOL", "YETI",
-                      "RBLX", "ROKU", "AFRM", "PINS", "CSCO", "MGM", "ASPN", "GEHC"],
-        "Thursday": ["DDOG", "CYBR", "DE", "CROX", "DUK", "PGY", "SONY", "PCG", "HWM", 
-                     "GEHC", "CON", "TWLO", "DKNG", "AMAT", "ABNB", "PANW", "ROKU", "WYNN", "HL", "RSG"],
-        "Friday": ["MRNA", "ENB", "AXL", "AMC", "MGA", "POR", "FTS", "ACDVF", "SXT", "SXT", "ESNT"]
+        "Monday": ["RIG", "NE", "UFPI", "JELD", "JW", "HUN", "OTTR", "TNC"],
+        "Tuesday": ["BIDU", "GENE", "AXSM", "MDT", "ETR", "FLR", "WSO", "EXPD", "SPNS", "CAG", 
+                    "ARISTA", "OXY", "DVN", "TOL", "HALO", "MTDR", "UIS", "CE", "SBLK", "CNS", "CDNS"],
+        "Wednesday": ["ETSY", "SEDG", "GRMN", "WIX", "FVRR", "GLBE", "TECK", "ADI", "KRYS", "WING",
+                      "CVNA", "TOST", "ENVX", "CAKE", "BMRN", "EXAS", "BHC", "VALE", "NYMT", "CDE"],
+        "Thursday": ["BABA", "WMT", "U", "W", "CCJ", "BAX", "NICE", "JUMIA", "SHAK", "LNG", 
+                     "RIVN", "SQ", "NEM", "INOD", "BKNG", "TXRH", "GNT", "FIVN", "DBX"],
+        "Friday": ["ABR", "ATMU", "ASIX", "SHO", "UNIT", "TXNM", "VIPS", "USM", "BRC", "OIS"]
     }
 
 def get_todays_stocks():
