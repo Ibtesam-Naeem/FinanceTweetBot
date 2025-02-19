@@ -295,9 +295,9 @@ if __name__ == "__main__":
     schedule.every().day.at("15:46").do(post_week_low_52_tweet)          # 3:46 PM
     schedule.every().day.at("15:50").do(post_all_time_high_tweet)        # 3:50 PM
     schedule.every().day.at("15:51").do(post_all_time_low_tweet)         # 3:51 PM
-    schedule.every().day.at("23:00").do(post_daily_econ_tweet)           # 11:00 PM
-    schedule.every().day.at("22:00").do(post_weekly_econ_tweet)          # 10:00 PM
-    schedule.every().hour.do(post_fear_sentiment)                        # every hour
+    schedule.every().day.at("22:00").do(post_daily_econ_tweet)           # 11:00 PM
+    schedule.every().sunday.at("22:00").do(post_weekly_econ_tweet)       # 10:00 PM
+    # schedule.every().hour.do(post_fear_sentiment)                        # every hour
     schedule.every().day.at("16:05").do(post_daily_market_summary)
     schedule.every().friday.at("16:20").do(post_weekly_market_summary)
     

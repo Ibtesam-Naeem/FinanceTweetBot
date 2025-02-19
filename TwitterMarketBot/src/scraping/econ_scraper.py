@@ -85,18 +85,23 @@ def day(driver, option):
 
 def scrape_economics_data(driver):
     """
-    Extracts the Economic Event data from Trading View
+    Extracts the Economic Event data from Trading View.
     """
     logging.info("Waiting for the economic calendar to load.")
-
-    WebDriverWait(driver, 20).until(
-        EC.presence_of_element_located((By.XPATH, "//div[contains(@data-name, 'economic-calendar-item')]"))
-    )
+    
+    try:
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.XPATH, "//div[contains(@data-name, 'economic-calendar-item')]"))
+        )
+        
+    except Exception:
+        logging.warning("No economic calendar data available. Skipping scrape.")
+        return []  
 
     rows = driver.find_elements(By.XPATH, "//div[contains(@data-name, 'economic-calendar-item')]")
 
     if not rows:
-        logging.error("No economic calendar rows found.")
+        logging.warning("No economic calendar rows found. Skipping.")
         return []
 
     econ_data = []
@@ -106,11 +111,9 @@ def scrape_economics_data(driver):
             event_element = row.find_element(By.XPATH, ".//span[contains(@class, 'titleText')]")
             event_name = event_element.text.strip()
 
-        except Exception as e:
+        except Exception:
             event_name = "N/A"
-            
-        econ_data.append({
-            "Event": event_name,
-        })
+
+        econ_data.append({"Event": event_name})
 
     return econ_data
