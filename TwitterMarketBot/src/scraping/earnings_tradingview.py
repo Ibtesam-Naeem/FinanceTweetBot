@@ -1,3 +1,7 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -62,13 +66,19 @@ def scrape_earnings_data(driver):
         EC.presence_of_element_located((By.CLASS_NAME, "tv-data-table"))
     )
 
-    rows = driver.find_elements(By.CLASS_NAME, "tv-data-table__row")
     earnings_data = []
-
     tracked_stocks = get_todays_stocks()
 
-    for row in rows:
+    index = 0
+    while True:
         try:
+            rows = driver.find_elements(By.CLASS_NAME, "tv-data-table__row")
+            
+            if index >= len(rows):
+                break
+            
+            row = rows[index]
+
             ticker_element = WebDriverWait(row, 3).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, "[data-field-key='name']"))
             )
@@ -82,7 +92,7 @@ def scrape_earnings_data(driver):
 
                 revenue_forecast_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='revenue_forecast_next_fq']")
                 revenue_forecast = revenue_forecast_element.text.strip("USD") if revenue_forecast_element else "N/A"
-                
+
                 try:
                     time_reporting_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='earnings_release_next_time']")
                     time_reporting = time_reporting_element.get_attribute("title").strip() if time_reporting_element else "N/A"
@@ -96,8 +106,11 @@ def scrape_earnings_data(driver):
                     "Time": time_reporting
                 })
 
+            index += 1
+
         except Exception as e:
             logging.error(f"Error processing row: {e}")
+            index += 1
 
     return earnings_data
 
