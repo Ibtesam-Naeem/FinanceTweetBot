@@ -1,7 +1,3 @@
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -9,6 +5,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config.chrome_options import chrome_options 
 from config.logger import setup_logging
+import time
+import heapq
 
 logging = setup_logging("EarningsScraper")
 
@@ -62,6 +60,7 @@ def scrape_earnings_data(driver):
     Extracts earnings data from TradingView and filters
     for today's tracked stocks.
     """
+    time.sleep(1)
     WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CLASS_NAME, "tv-data-table"))
     )
@@ -90,9 +89,14 @@ def scrape_earnings_data(driver):
                 eps_estimate_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='earnings_per_share_forecast_next_fq']")
                 eps_estimate = eps_estimate_element.text.strip("USD") if eps_estimate_element else "N/A"
 
+                reported_eps_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='earnings_per_share_fq']")
+                reported_eps = reported_eps_element.text.strip("USD") if reported_eps_element else "N/A"
+
                 revenue_forecast_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='revenue_forecast_next_fq']")
                 revenue_forecast = revenue_forecast_element.text.strip("USD") if revenue_forecast_element else "N/A"
 
+                reported_revenue_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='revenue_fq']")
+                reported_revenue = reported_revenue_element.text.strip("USD") if reported_revenue_element else "N/A"
                 try:
                     time_reporting_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='earnings_release_next_time']")
                     time_reporting = time_reporting_element.get_attribute("title").strip() if time_reporting_element else "N/A"
@@ -102,7 +106,9 @@ def scrape_earnings_data(driver):
                 earnings_data.append({
                     "Ticker": ticker,
                     "EPS Estimate": eps_estimate,
+                    "Reported EPS": reported_eps,
                     "Revenue Forecast": revenue_forecast,
+                    "Reported Revenue": reported_revenue,
                     "Time": time_reporting
                 })
 
@@ -114,10 +120,26 @@ def scrape_earnings_data(driver):
 
     return earnings_data
 
+def get_top_5_after_close(earnings_data):
+    """
+    Get top 5 stocks by Market Cap reporting After Close
+    using a Min-Heap for efficient selection.
+    """
+    min_heap = []
+
+    for stock in earnings_data:
+        if stock["Time"] == "After Close" and stock["Market Cap"]:
+            heapq.heappush(min_heap, (stock["Market Cap"], stock))
+            if len(min_heap) > 5:
+                heapq.heappop(min_heap)
+    
+    top_5 = [stock for _, stock in sorted(min_heap, reverse=True)]
+    return top_5
+
 def scrape_todays_earnings():
     """
-    Scrapes today's earnings
-    from TradingView.
+    Scrapes today's earnings from TradingView
+    and selects the top 3 by Market Cap.
     """
     driver = open_earnings_calendar()
     if not driver:
@@ -125,7 +147,12 @@ def scrape_todays_earnings():
         return []
 
     try:
-        return scrape_earnings_data(driver)
+        earnings_data = scrape_earnings_data(driver)
+        top_5_stocks = get_top_5_after_close(earnings_data)
+        top_3_stocks = top_5_stocks[:3]
+        logging.info(f"Top 5 After Close by Market Cap: {top_5_stocks}")
+        logging.info(f"Top 3 for Price Check: {top_3_stocks}")
+        return top_3_stocks
 
     except Exception as e:
         logging.error(f"Error scraping earnings: {e}.")
@@ -133,4 +160,3 @@ def scrape_todays_earnings():
     
     finally:
         driver.quit()
-
