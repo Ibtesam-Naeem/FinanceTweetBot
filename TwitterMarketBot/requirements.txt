@@ -3,4 +3,3 @@ requests==2.32.3
 requests-oauthlib==2.0.0
 selenium==4.28.1
 tweepy==4.15.0
-twilio==9.4.4 # For SMS function if needed
