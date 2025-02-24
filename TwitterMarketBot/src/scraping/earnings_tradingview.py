@@ -5,8 +5,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config.chrome_options import chrome_options 
 from config.logger import setup_logging
-import time
-import heapq
 
 logging = setup_logging("EarningsScraper")
 
@@ -16,7 +14,7 @@ def earnings_to_be_tracked():
     of the week to the stocks being tracked.
     """
     return {
-        "Sunday": ["DPZ", "BRK.B", "AZUL", "BCRX", "KSPI", "LINC", "SMMT", "WLK", "SSL", "CCO",
+        "Monday": ["DPZ", "BRK.B", "AZUL", "BCRX", "KSPI," "LINC", "SMMT", "WLK", "SSL", "CCO",
                    "HIMS", "RIOT", "TEMP", "CLF", "ZM", "FANG", "CTRA", "O", "CHGG", "TCOM"],
         "Tuesday": ["HD", "PLNT", "KDP", "DOCN", "ALLT", "CIFR", "BNS", "DNUT", "ITRI", "AMT",
                     "CAVA", "AMC", "AXON", "FSLR", "LCID", "CART", "LMND", "WDAY", "ZETA", "INTU"],
@@ -61,7 +59,6 @@ def scrape_earnings_data(driver):
     Extracts earnings data from TradingView and filters
     for today's tracked stocks.
     """
-    time.sleep(1)
     WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CLASS_NAME, "tv-data-table"))
     )
@@ -121,26 +118,10 @@ def scrape_earnings_data(driver):
 
     return earnings_data
 
-def get_top_5_after_close(earnings_data):
-    """
-    Get top 5 stocks by Market Cap reporting After Close
-    using a Min-Heap for efficient selection.
-    """
-    min_heap = []
-
-    for stock in earnings_data:
-        if stock["Time"] == "After Close" and stock["Market Cap"]:
-            heapq.heappush(min_heap, (stock["Market Cap"], stock))
-            if len(min_heap) > 5:
-                heapq.heappop(min_heap)
-    
-    top_5 = [stock for _, stock in sorted(min_heap, reverse=True)]
-    return top_5
-
 def scrape_todays_earnings():
     """
-    Scrapes today's earnings from TradingView
-    and selects the top 3 by Market Cap.
+    Scrapes today's earnings
+    from TradingView.
     """
     driver = open_earnings_calendar()
     if not driver:
@@ -148,12 +129,7 @@ def scrape_todays_earnings():
         return []
 
     try:
-        earnings_data = scrape_earnings_data(driver)
-        top_5_stocks = get_top_5_after_close(earnings_data)
-        top_3_stocks = top_5_stocks[:3]
-        logging.info(f"Top 5 After Close by Market Cap: {top_5_stocks}")
-        logging.info(f"Top 3 for Price Check: {top_3_stocks}")
-        return top_3_stocks
+        return scrape_earnings_data(driver)
 
     except Exception as e:
         logging.error(f"Error scraping earnings: {e}.")
