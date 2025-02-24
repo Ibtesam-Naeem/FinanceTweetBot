@@ -16,14 +16,15 @@ def earnings_to_be_tracked():
     of the week to the stocks being tracked.
     """
     return {
-        "Monday": ["RIG", "NE", "UFPI", "JELD", "JW", "HUN", "OTTR", "TNC"],
-        "Tuesday": ["BIDU", "GENE", "AXSM", "MDT", "ETR", "FLR", "WSO", "EXPD", "SPNS", "CAG", 
-                    "ARISTA", "OXY", "DVN", "TOL", "HALO", "MTDR", "UIS", "CE", "SBLK", "CNS", "CDNS"],
-        "Wednesday": ["ETSY", "SEDG", "GRMN", "WIX", "FVRR", "GLBE", "TECK", "ADI", "KRYS", "WING",
-                      "CVNA", "TOST", "ENVX", "CAKE", "BMRN", "EXAS", "BHC", "VALE", "NYMT", "CDE"],
-        "Thursday": ["BABA", "WMT", "U", "W", "CCJ", "BAX", "NICE", "JUMIA", "SHAK", "LNG", 
-                     "RIVN", "SQ", "NEM", "INOD", "BKNG", "TXRH", "GNT", "FIVN", "DBX"],
-        "Friday": ["ABR", "ATMU", "ASIX", "SHO", "UNIT", "TXNM", "VIPS", "USM", "BRC", "OIS"]
+        "Sunday": ["DPZ", "BRK.B", "AZUL", "BCRX", "KSPI", "LINC", "SMMT", "WLK", "SSL", "CCO",
+                   "HIMS", "RIOT", "TEMP", "CLF", "ZM", "FANG", "CTRA", "O", "CHGG", "TCOM"],
+        "Tuesday": ["HD", "PLNT", "KDP", "DOCN", "ALLT", "CIFR", "BNS", "DNUT", "ITRI", "AMT",
+                    "CAVA", "AMC", "AXON", "FSLR", "LCID", "CART", "LMND", "WDAY", "ZETA", "INTU"],
+        "Wednesday": ["LOW", "NRG", "AAP", "YOU", "BYD", "STLA", "IEP", "INVZ", "VLN", "UWMC",
+                      "NVDA", "SNOW", "AI", "CRM", "MARA", "JOBY", "IONQ", "ROOT", "KTOS", "NTNX"],
+        "Thursday": ["VST", "NCLH", "GEO", "GTN", "VTRS", "VRNA", "TD", "MPW", "OPRA", "DQ",
+                     "SOUN", "DELL", "RKLB", "ACHR", "CLOB", "SMR", "TMDX", "DUOL", "TLN", "OPEN"],
+        "Friday": ["FUBO", "WULF", "GTLS", "FLGT", "AES", "FRO", "BFLY", "AMR", "DIBS", "APLS"]
     }
 
 def get_todays_stocks():
