@@ -1,12 +1,4 @@
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import sys
-import os
-import datetime
-import time
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -69,19 +61,21 @@ def navigate_to_yahoo():
             logging.info(f"Market Cap (Raw): {market_cap_text}")
 
             market_cap_number = extract_market_cap(market_cap_text)
-            if market_cap_number > 10_000_000_000:
+            if market_cap_number and market_cap_number > 10_000_000_000:
                 formatted_market_cap = f"{market_cap_number:,.0f}"
-                logging.info(f"Market Cap: {formatted_market_cap:}")
-            
-            try:
-                statistics_button = WebDriverWait(driver, 10).until(
-                    EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, '/key-statistics/')]"))
-                )
-                statistics_button.click()
-                logging.info("Clicked on 'Statistics' button.")
-                
-            except Exception as e:
-                logging.error(f"Error clicking on 'Statistics' button: {e}")
+                logging.info(f"Market Cap: {formatted_market_cap}")
+
+                try:
+                    statistics_button = WebDriverWait(driver, 10).until(
+                        EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, '/key-statistics/')]"))
+                    )
+                    statistics_button.click()
+                    logging.info("Clicked on 'Statistics' button.")
+                    extract_statistics_page(driver)
+                except Exception as e:
+                    logging.error(f"Error clicking on 'Statistics' button: {e}")
+            else:
+                logging.info("Market cap is below $10 billion. Skipping Statistics page.")
 
         except Exception as e:
             logging.error(f"Error processing {stock}: {e}")  
@@ -91,7 +85,6 @@ def extract_statistics_page(driver):
     Extracts 52-Week Low, 52-Week High, 52-Week Percentage Change,
     50-Day Moving Average, and 200-Day Moving Average from Yahoo Finance.
     """
-    
     try:
         low = high = percentage = average_50 = average_200 = None
 
@@ -154,5 +147,6 @@ def extract_statistics_page(driver):
     except Exception as e:
         logging.error(f"Error extracting financial highlights: {e}")
         return None
-
-
+    
+if __name__ == "__main__":
+    navigate_to_yahoo()
