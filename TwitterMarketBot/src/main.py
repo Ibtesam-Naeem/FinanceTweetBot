@@ -11,7 +11,7 @@ from scraping.econ_scraper import (
     day,
     scrape_economics_data,
 )
-from scraping.market_movers import open_premarket_page, premarket_data_scraper
+from scraping.market_movers import open_premarket_page, premarket_data_scraper, premarket_data_scraper_two, premarket_data_scraper_three
 from scraping.sentiment import fear_index
 from scraping.closing_prices import get_market_data, get_weekly_data
 from scraping.general_info import trading_holidays
@@ -136,7 +136,7 @@ def post_pre_market_gainers_tweet():
         "https://www.tradingview.com/markets/stocks-usa/market-movers-pre-market-gainers/"
     )
     if driver:
-        gainers_data = premarket_data_scraper(driver)
+        gainers_data = premarket_data_scraper_two(driver)
         tweet = pre_market_gainer(gainers_data)
         send_tweet(tweet)
         driver.quit()
@@ -150,7 +150,7 @@ def post_pre_market_losers_tweet():
         "https://www.tradingview.com/markets/stocks-usa/market-movers-pre-market-losers/"
     )
     if driver:
-        losers_data = premarket_data_scraper(driver)
+        losers_data = premarket_data_scraper_two(driver)
         tweet = pre_market_losers(losers_data)
         send_tweet(tweet)
         driver.quit()
@@ -206,7 +206,7 @@ def post_all_time_low_tweet():
         "https://www.tradingview.com/markets/stocks-usa/market-movers-atl/"
     )
     if driver:
-        all_time_low_data = premarket_data_scraper(driver)
+        all_time_low_data = premarket_data_scraper_three(driver)
         tweet = all_time_low(all_time_low_data)
         send_tweet(tweet)
         driver.quit()
@@ -283,25 +283,44 @@ def post_trading_holiday():
     else:
         logging.error("No Holiday Tomorrow")
         
+import schedule
+import time
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+def show_next_job():
+    next_job = min(schedule.jobs, key=lambda job: job.next_run)
+    logging.info(f"Next job: {next_job.job_func.__name__} at {next_job.next_run}")
+
 if __name__ == "__main__":
     logging.info("Starting Twitter Bot Scheduler...")
 
-    schedule.every().day.at("04:45").do(post_pre_market_earnings_tweet)  # 4:45 AM
-    schedule.every().day.at("07:00").do(post_pre_market_gainers_tweet)   # 7:00 AM
-    schedule.every().day.at("07:05").do(post_pre_market_losers_tweet)    # 7:05 AM
-    schedule.every().day.at("08:00").do(post_gap_tweet)                  # 9:00 AM
-    schedule.every().day.at("12:00").do(post_after_hours_earnings_tweet) # 12:00 PM
-    schedule.every().day.at("15:45").do(post_week_high_52_tweet)         # 3:45 PM
-    schedule.every().day.at("15:46").do(post_week_low_52_tweet)          # 3:46 PM
-    schedule.every().day.at("15:50").do(post_all_time_high_tweet)        # 3:50 PM
-    schedule.every().day.at("15:51").do(post_all_time_low_tweet)         # 3:51 PM
-    schedule.every().day.at("22:00").do(post_daily_econ_tweet)           # 11:00 PM
-    schedule.every().sunday.at("22:00").do(post_weekly_econ_tweet)       # 10:00 PM
-    # schedule.every().hour.do(post_fear_sentiment)                        # every hour
-    schedule.every().day.at("16:05").do(post_daily_market_summary)
-    schedule.every().friday.at("16:20").do(post_weekly_market_summary)
-    
+    # Earnings Tweets
+    schedule.every().day.at("04:30").do(post_pre_market_earnings_tweet)  # 4:30 AM
+    schedule.every().day.at("12:00").do(post_after_hours_earnings_tweet) # 12:00 PM (Noon)
+
+    # Pre-Market Movements
+    schedule.every().day.at("09:00").do(post_pre_market_gainers_tweet)   # 9:00 AM
+    schedule.every().day.at("09:05").do(post_pre_market_losers_tweet)    # 9:05 AM
+    schedule.every().day.at("09:10").do(post_gap_tweet)                  # 9:10 AM
+
+    # Market Highs and Lows
+    schedule.every().day.at("14:45").do(post_week_high_52_tweet)         # 2:45 PM
+    schedule.every().day.at("14:45").do(post_week_low_52_tweet)          # 2:45 PM
+    schedule.every().day.at("15:00").do(post_all_time_high_tweet)        # 3:00 PM
+    # schedule.every().day.at("01:27").do(post_all_time_low_tweet)       # 1:27 AM 
+
+    # Economic Events
+    schedule.every().day.at("06:00").do(post_daily_econ_tweet)           # 7:00 AM
+    schedule.every().sunday.at("20:00").do(post_weekly_econ_tweet)       # 8:00 PM (Sunday)
+
+    # Main Loop
     while True:
         schedule.run_pending()
+        show_next_job()
         time.sleep(30)
+
+
+
 

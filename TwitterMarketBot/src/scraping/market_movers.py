@@ -94,7 +94,7 @@ def premarket_data_scraper(driver):
                 percent_element = row.find_element(By.CSS_SELECTOR, "td:nth-child(2) span")
                 percent_change = percent_element.text.strip()
                 
-                market_cap_element = row.find_element(By.XPATH, "./td[6]")
+                market_cap_element = row.find_element(By.XPATH, f"./td[6]")
                 market_cap = market_cap_element.text.strip("USD").strip()
 
                 market_cap_value = convert_market_cap_to_number(market_cap)
@@ -108,7 +108,7 @@ def premarket_data_scraper(driver):
                     })
 
         except Exception as e:
-            logging.error(f"Error processing row: {e}")
+            logging.error(f"Error processing row")
 
     sp500_stocks = [stock for stock in pre_market_data if stock['Ticker'] in sp500_tickers]
     non_sp500_stocks = [stock for stock in pre_market_data if stock['Ticker'] not in sp500_tickers]
@@ -116,13 +116,118 @@ def premarket_data_scraper(driver):
     random_non_sp500 = random.sample(non_sp500_stocks, min(len(non_sp500_stocks), 5))
 
     final_selection = sp500_stocks + random_non_sp500
-    logging.info(f"Total stocks scraped: {len(pre_market_data)}")
-    logging.info(f"Total S&P 500 stocks: {len(sp500_stocks)}")
-    logging.info(f"Total Non-S&P 500 stocks: {len(non_sp500_stocks)}")
-    logging.info(f"Final selection (S&P 500 + 5 random): {len(final_selection)}")
-
-    logging.info("Stocks at 52-week lows (S&P 500 and 5 random others):")
-    for stock in final_selection:
-        logging.info(f"{stock['Ticker']}: Change: {stock['Pre-Market Change']}: Market Cap: {stock['Market Cap']}")
 
     return final_selection
+
+def premarket_data_scraper_two(driver):
+    """
+    Extracts Pre-Market gainers or losers data from TradingView,
+    returns all S&P 500 stocks and 5 random non-S&P 500 stocks.
+    """
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "tv-category-content"))
+    )
+
+    pre_market_data = []
+    
+    while True:
+        try:
+            load_more_button = WebDriverWait(driver, 3).until(
+                EC.element_to_be_clickable((By.CLASS_NAME, "content-D4RPB3ZC"))
+            )
+            load_more_button.click()
+            logging.info("Clicked 'Load More' button. Loading more data.")
+            time.sleep(2)
+        except:
+            logging.info("No more 'Load More' button found. All data loaded.")
+            break
+
+    rows = driver.find_elements(By.XPATH, "//div[contains(@class, 'tv-category-content')]//table/tbody/tr")
+
+    for row in rows:
+        try:
+            ticker_element = row.find_element(By.XPATH, "./td[1]//span")
+            ticker_full = ticker_element.text.strip()
+            ticker = ticker_full.split("\n")[0]
+
+            if len(ticker) > 1:
+                percent_element = row.find_element(By.CSS_SELECTOR, "td:nth-child(2) span")
+                percent_change = percent_element.text.strip()
+                
+                market_cap_element = row.find_element(By.XPATH, f"./td[10]")
+                market_cap = market_cap_element.text.strip("USD").strip()
+
+                market_cap_value = convert_market_cap_to_number(market_cap)
+
+                if market_cap_value > 100_000_000:
+                    logging.info(f"Ticker: {ticker}, Market Cap: {market_cap_value}")
+                    pre_market_data.append({
+                        "Ticker": ticker,
+                        "Pre-Market Change": percent_change,
+                        "Market Cap": market_cap_value
+                    })
+
+        except Exception as e:
+            logging.error(f"Error processing row")
+
+    sp500_stocks = [stock for stock in pre_market_data if stock['Ticker'] in sp500_tickers]
+    non_sp500_stocks = [stock for stock in pre_market_data if stock['Ticker'] not in sp500_tickers]
+
+    random_non_sp500 = random.sample(non_sp500_stocks, min(len(non_sp500_stocks), 5))
+
+    final_selection = sp500_stocks + random_non_sp500
+
+    return final_selection
+
+def premarket_data_scraper_three(driver):
+    """
+    Extracts Pre-Market gainers or losers data from TradingView,
+    returns all S&P 500 stocks and 5 random non-S&P 500 stocks.
+    """
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "tv-category-content"))
+    )
+
+    pre_market_data = []
+    
+    while True:
+        try:
+            load_more_button = WebDriverWait(driver, 3).until(
+                EC.element_to_be_clickable((By.CLASS_NAME, "content-D4RPB3ZC"))
+            )
+            load_more_button.click()
+            logging.info("Clicked 'Load More' button. Loading more data.")
+            time.sleep(2)
+        except:
+            logging.info("No more 'Load More' button found. All data loaded.")
+            break
+
+    rows = driver.find_elements(By.XPATH, "//div[contains(@class, 'tv-category-content')]//table/tbody/tr")
+
+    for row in rows:
+        try:
+            ticker_element = row.find_element(By.XPATH, "./td[1]//span")
+            ticker_full = ticker_element.text.strip()
+            ticker = ticker_full.split("\n")[0]
+
+            if len(ticker) > 1:
+                percent_element = row.find_element(By.CSS_SELECTOR, "td:nth-child(2) span")
+                percent_change = percent_element.text.strip()
+                
+                market_cap_element = row.find_element(By.XPATH, f"./td[5]")
+                market_cap = market_cap_element.text.strip("USD").strip()
+
+                market_cap_value = convert_market_cap_to_number(market_cap)
+
+                if market_cap_value > 100_000_000:
+                    logging.info(f"Ticker: {ticker}, Market Cap: {market_cap_value}")
+                    pre_market_data.append({
+                        "Ticker": ticker,
+                        "Pre-Market Change": percent_change,
+                        "Market Cap": market_cap_value
+                    })
+
+        except Exception as e:
+            logging.error(f"Error processing row")
+
+    return pre_market_data
