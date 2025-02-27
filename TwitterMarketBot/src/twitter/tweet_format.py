@@ -68,7 +68,7 @@ def pre_market_gainer(gainers_list):
     tweet = "Stocks rising in pre-market\n\n"
 
     for stock in gainers_list[:10]:
-        tweet += f"- {stock['Ticker']} last up +{stock['Pre-Market Change']}\n"
+        tweet += f"- {stock['Ticker']} last up {stock['Pre-Market Change']}\n"
 
     return tweet.strip()
 
@@ -82,7 +82,7 @@ def pre_market_losers(losers_list):
     tweet = "Stocks dropping in pre-market\n\n"
 
     for stock in losers_list[:10]:
-        tweet += f"- {stock['Ticker']} last down -{stock['Pre-Market Change']}\n"
+        tweet += f"- {stock['Ticker']} last down {stock['Pre-Market Change']}\n"
 
     return tweet.strip()
 

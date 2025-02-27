@@ -282,16 +282,9 @@ def post_trading_holiday():
         send_tweet()
     else:
         logging.error("No Holiday Tomorrow")
-        
-import schedule
-import time
-import logging
+
 
 logging.basicConfig(level=logging.INFO)
-
-def show_next_job():
-    next_job = min(schedule.jobs, key=lambda job: job.next_run)
-    logging.info(f"Next job: {next_job.job_func.__name__} at {next_job.next_run}")
 
 if __name__ == "__main__":
     logging.info("Starting Twitter Bot Scheduler...")
@@ -309,7 +302,7 @@ if __name__ == "__main__":
     schedule.every().day.at("14:45").do(post_week_high_52_tweet)         # 2:45 PM
     schedule.every().day.at("14:45").do(post_week_low_52_tweet)          # 2:45 PM
     schedule.every().day.at("15:00").do(post_all_time_high_tweet)        # 3:00 PM
-    # schedule.every().day.at("01:27").do(post_all_time_low_tweet)       # 1:27 AM 
+    schedule.every().day.at("01:27").do(post_all_time_low_tweet)         # 3:00 PM 
 
     # Economic Events
     schedule.every().day.at("06:00").do(post_daily_econ_tweet)           # 7:00 AM
@@ -318,7 +311,6 @@ if __name__ == "__main__":
     # Main Loop
     while True:
         schedule.run_pending()
-        show_next_job()
         time.sleep(30)
 
 
