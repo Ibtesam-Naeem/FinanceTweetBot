@@ -13,22 +13,23 @@ def store_earnings_data(data):
         CREATE TABLE IF NOT EXISTS earnings_reports (
             id SERIAL PRIMARY KEY,
             ticker TEXT NOT NULL,
+            report_date DATE NOT NULL,
             eps_estimate TEXT,
             revenue_forecast TEXT,
             time TEXT NOT NULL,
-            UNIQUE (ticker, time)  -- 
+            UNIQUE (ticker, report_date, time)  -- Updated to include report_date
         )
     """)
     conn.commit()
     
     for record in data:
         cur.execute("""
-            INSERT INTO earnings_reports (ticker, eps_estimate, revenue_forecast, time)
-            VALUES (%s, %s, %s, %s)
-            ON CONFLICT (ticker, time) DO UPDATE
+            INSERT INTO earnings_reports (ticker, report_date, eps_estimate, revenue_forecast, time)
+            VALUES (%s, %s, %s, %s, %s)
+            ON CONFLICT (ticker, report_date, time) DO UPDATE
             SET eps_estimate = EXCLUDED.eps_estimate,
                 revenue_forecast = EXCLUDED.revenue_forecast
-        """, (record["Ticker"], record["EPS Estimate"], record["Revenue Forecast"], record["Time"]))
+        """, (record["Ticker"], record["report_date"], record["EPS Estimate"], record["Revenue Forecast"], record["Time"]))
     
     conn.commit()
     cur.close()

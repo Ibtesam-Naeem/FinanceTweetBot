@@ -104,7 +104,6 @@ def premarket_data_scraper(driver, market_cap_column=6, min_market_cap=5_000_000
                 market_cap_value = convert_market_cap_to_number(market_cap)
 
                 if market_cap_value > min_market_cap:
-                    logging.info(f"Ticker: {ticker}, Market Cap: {market_cap_value}")
                     pre_market_data.append({
                         "Ticker": ticker,
                         "Pre-Market Change": percent_change,

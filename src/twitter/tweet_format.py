@@ -40,7 +40,7 @@ def econ_reminder_tomorrow(econ_list):
     tweet = "Major economic events TOMORROW:\n\n"
 
     for event in econ_list:
-        tweet += f"- {event['Event']}\n"
+        tweet += f"- {event['event']}\n"
 
     return tweet.strip()
 
@@ -54,7 +54,7 @@ def econ_reminder_weekly(econ_list):
     tweet = "Major economic events THIS WEEK:\n\n"
 
     for event in econ_list:
-        tweet += f"- {event['Event']}\n"
+        tweet += f"- {event['event']}\n"
 
     return tweet.strip()
 

@@ -279,17 +279,17 @@ if __name__ == "__main__":
     schedule.every().day.at("12:00").do(post_after_hours_earnings_tweet) # 12:00 PM (Noon)
 
     # Pre-Market Movements
-    schedule.every().day.at("16:37").do(post_pre_market_gainers_tweet)   # 9:00 AM
-    schedule.every().day.at("16:37").do(post_pre_market_losers_tweet)    # 9:05 AM
-    schedule.every().day.at("16:37").do(post_gap_tweet)                  # 9:10 AM
+    schedule.every().day.at("09:00").do(post_pre_market_gainers_tweet)   # 9:00 AM
+    schedule.every().day.at("09:05").do(post_pre_market_losers_tweet)    # 9:05 AM
+    schedule.every().day.at("09:10").do(post_gap_tweet)                  # 9:10 AM
 
     # Market Highs and Lows
-    schedule.every().day.at("16:37").do(post_week_high_52_tweet)         # 2:45 PM
-    schedule.every().day.at("16:37").do(post_week_low_52_tweet)          # 2:45 PM
-    schedule.every().day.at("16:37").do(post_all_time_high_tweet)        # 3:00 PM
+    schedule.every().day.at("14:45").do(post_week_high_52_tweet)         # 2:45 PM
+    schedule.every().day.at("14:45").do(post_week_low_52_tweet)          # 2:45 PM
+    schedule.every().day.at("15:00").do(post_all_time_high_tweet)        # 3:00 PM
 
     # Economic Events
-    schedule.every().day.at("06:00").do(post_daily_econ_tweet)           # 6:00 AM
+    schedule.every().day.at("20:00").do(post_daily_econ_tweet)           # 8:00 PM
     schedule.every().sunday.at("20:00").do(post_weekly_econ_tweet)       # 8:00 PM (Sunday)
 
     # Main Loop

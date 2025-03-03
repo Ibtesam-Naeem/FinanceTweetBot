@@ -97,7 +97,7 @@ def scrape_earnings_data(driver):
 
     before_open_stocks, after_close_stocks = get_todays_stocks()
 
-    def process_stocks(stock_set):
+    def process_stocks(stock_set, time_label):
         index = 0
         while True:
             try:
@@ -122,11 +122,7 @@ def scrape_earnings_data(driver):
                     revenue_forecast_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='revenue_forecast_next_fq']")
                     revenue_forecast = revenue_forecast_element.text.strip("USD") if revenue_forecast_element else "N/A"
 
-                    try:
-                        time_reporting_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='earnings_release_next_time']")
-                        time_reporting = time_reporting_element.get_attribute("title").strip() if time_reporting_element else "N/A"
-                    except:
-                        time_reporting = "N/A"
+                    time_reporting = time_label
 
                     earnings_data.append({
                         "Ticker": ticker,
@@ -143,10 +139,10 @@ def scrape_earnings_data(driver):
                 index += 1
 
     logging.info("Checking earnings for Before Open stocks first.")
-    process_stocks(before_open_stocks)
+    process_stocks(before_open_stocks, "Before Open")
 
     logging.info("Checking earnings for After Close stocks.")
-    process_stocks(after_close_stocks)
+    process_stocks(after_close_stocks, "After Close")
 
     return earnings_data
 
@@ -160,18 +156,23 @@ def scrape_todays_earnings():
         logging.error("WebDriver initialization failed.")
         return []
 
+    earnings_data = [] 
+
     try:
         earnings_data = scrape_earnings_data(driver)
 
         if earnings_data:
-            store_earnings_data(earnings_data)
-            logging.info(f"Successfully stored {len(earnings_data)} earnings records in the database.")
-        
+            try:
+                store_earnings_data(earnings_data)
+                logging.info(f"Successfully stored {len(earnings_data)} earnings records in the database.")
+            except Exception as db_error:
+                logging.error(f"Failed to store earnings in database: {db_error}")
+
         return earnings_data
 
     except Exception as e:
-        logging.error(f"Error scraping earnings: {e}.")
-        return []
+        logging.error(f"Error scraping earnings: {e}")
+        return earnings_data 
     
     finally:
         driver.quit()
