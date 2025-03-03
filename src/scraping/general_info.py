@@ -1,20 +1,23 @@
-import json
-from datetime import datetime, timedelta
+from config.db_manager import get_db_connection
 
 def trading_holidays():
     """
-    Checks if the stock market is open or
-    closed tomorrow.
+    Fetches trading holidays from the database.
     """
-    with open('trading_days.json', 'r') as file:
-        holidays = json.load(file)
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    cur.execute("SELECT holiday_date, holiday_name, early_close FROM trading_holidays;")
+    holidays = cur.fetchall()
 
-    tomorrow = datetime.today() + timedelta(days=1)
-    tomorrow_str = tomorrow.strftime("%Y-%m-%d")
+    cur.close()
+    conn.close()
 
-    holiday_info = next((holiday for holiday in holidays['2025'] if holiday['date'] == tomorrow_str), None)
-
-    if holiday_info:
-        return True, holiday_info['holiday']
-    else:
-        return False, None 
+    return [
+        {
+            "date": holiday[0],
+            "name": holiday[1],
+            "early_close": holiday[2]
+        }
+        for holiday in holidays
+    ]

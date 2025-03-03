@@ -1,16 +1,16 @@
 import time
+import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config.chrome_options import chrome_options
 from config.logger import setup_logging
-
+from config.db_manager import store_economic_data  
 logging  = setup_logging("EconScraper")
 
-def open_earnings_calendar():
+def open_economic_calendar():
     """
-    Navigates to the Trading Views
-    USDCAD Economic Calendar page.
+    Navigates to the Trading View USDCAD Economic Calendar page.
     """
     try:
         driver = chrome_options()
@@ -32,8 +32,7 @@ def open_earnings_calendar():
 
 def click_importance(driver):
     """
-    Clicks the Importance filter button
-    and then click on "Today"
+    Clicks the Importance filter button.
     """
     try:
         logging.info("Finding the High Importance button.")
@@ -52,38 +51,9 @@ def click_importance(driver):
     except Exception as e:
         logging.error(f"Failed to click Importance button: {e}")
 
-def day(driver, option):
+def scrape_economic_data(driver):
     """
-    Selects the date given the scraping
-    option: 'Tomorrow' or 'This Week'.
-    """
-    try:
-        logging.info(f"Clicking on '{option}' option.")
-
-        option_xpath = {
-            "Tomorrow": '//*[@id="Tomorrow"]/span[1]/span',
-            "This Week": '//*[@id="This week"]/span[1]/span'
-        }
-
-        if option not in option_xpath:
-            logging.error(f"Invalid option: {option}")
-            return
-
-        button = driver.find_element(By.XPATH, option_xpath[option])
-        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", button)
-        
-        time.sleep(2)  
-        
-        driver.execute_script("arguments[0].click();", button)
-
-        logging.info(f"'{option}' button clicked successfully.")
-
-    except Exception as e:
-        logging.error(f"Failed to click '{option}' button: {e}")
-
-def scrape_economics_data(driver):
-    """
-    Extracts the Economic Event data from Trading View.
+    Extracts the Economic Event data from TradingView.
     """
     logging.info("Waiting for the economic calendar to load.")
     
@@ -108,10 +78,37 @@ def scrape_economics_data(driver):
         try:
             event_element = row.find_element(By.XPATH, ".//span[contains(@class, 'titleText')]")
             event_name = event_element.text.strip()
-
         except Exception:
             event_name = "N/A"
 
-        econ_data.append({"Event": event_name})
+        econ_data.append({
+            "event": event_name,
+            "date": datetime.datetime.now().date()
+        })
 
     return econ_data
+
+def scrape_and_store_economic_data():
+    """
+    Scrapes today's economic events and stores them in the database.
+    """
+    driver = open_economic_calendar()
+    if not driver:
+        logging.error("WebDriver initialization failed.")
+        return []
+
+    try:
+        economic_data = scrape_economic_data(driver)
+
+        if economic_data:
+            store_economic_data(economic_data)
+            logging.info(f"Successfully stored {len(economic_data)} economic events in the database.")
+
+        return economic_data
+
+    except Exception as e:
+        logging.error(f"Error scraping economic data: {e}.")
+        return []
+    
+    finally:
+        driver.quit()

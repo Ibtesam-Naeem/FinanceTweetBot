@@ -4,10 +4,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from config.chrome_options import chrome_options
 from config.logger import setup_logging
-from scraping.stocks_list import sp500_tickers
+from config.db_manager import get_sp500_tickers
 import random
 
 logging = setup_logging("MarketMoversLogger")
+
+sp500_tickers = get_sp500_tickers() 
 
 def convert_market_cap_to_number(market_cap_str):
     """

@@ -5,34 +5,33 @@ from selenium.webdriver.support import expected_conditions as EC
 from config.chrome_options import chrome_options 
 from config.logger import setup_logging
 import time
+from config.db_manager import store_earnings_data 
 logging = setup_logging("EarningsScraper")
 
 def earnings_to_be_tracked():
     """
     Returns a dictionary mapping days
     of the week to the stocks being tracked.
-    First line: Before Open
-    Second line: After Close
     """
     return {
         "Monday": {
-            "Before Open": ["DPZ", "BRK.B", "AZUL", "BCRX", "KSPI", "LINC", "SMMT", "WLK", "SSL", "CCO", "NOVA", "HUT", "PLUG", "TGTX", "SPHR", "AVDL", "BLFS", "BUR", "RC", "SGRY", "NUSCALE", "OKTRA", "ASTS", "GTLB", "ADMA", "GCT", "SENS", "MRC", "TDUP", "QSI"],
-            "After Close": ["HIMS", "RIOT", "TEMP", "CLF", "ZM", "FANG", "CTRA", "O", "CHGG", "TCOM"]
+            "Before Open": ["NOVA", "HUT", "PLUG", "TGTX", "SPHR", "AVDL", "BLFS", "BUR", "RC", "SGRY"],
+            "After Close": ["NUSCALE", "OKTRA", "ASTS", "GTLB", "ADMA", "GCT", "SENS", "MRC", "TDUP", "QSI"]
         },
         "Tuesday": {
-            "Before Open": ["HD", "PLNT", "KDP", "DOCN", "ALLT", "CIFR", "BNS", "DNUT", "ITRI", "AMT", "TGT", "BBY", "SE", "AZO", "PSFE", "EVGO", "ESPR", "GENI", "ONON", "NYAX"],
-            "After Close": ["CAVA", "AMC", "AXON", "FSLR", "LCID", "CART", "LMND", "WDAY", "ZETA", "INTU", "CRWD", "CRDO", "STEM", "JWN", "ORN", "BOX", "ROST", "KIDS", "CHPT", "NPCE"]
+            "Before Open": ["TGT", "BBY", "SE", "AZO", "PSFE", "EVGO", "ESPR", "GENI", "ONON", "NYAX"],
+            "After Close": ["CRWD", "CRDO", "STEM", "JWN", "ORN", "BOX", "ROST", "KIDS", "CHPT", "NPCE"]
         },
         "Wednesday": {
-            "Before Open": ["LOW", "NRG", "AAP", "YOU", "BYD", "STLA", "IEP", "INVZ", "VLN", "UWMC", "ANG", "FL", "OPFI", "THO", "SSYS", "RSKD", "EDIT", "REVG"],
-            "After Close": ["NVDA", "SNOW", "AI", "CRM", "MARA", "JOBY", "IONQ", "ROOT", "KTOS", "NTNX", "MRVL", "RGTI", "ZS", "MDB", "VEEVA", "VSCO", "TREE", "KGS", "LB", "FSM"]
+            "Before Open": ["ANG", "FL", "OPFI", "THO", "SSYS", "RSKD", "EDIT", "REVG"],
+            "After Close": ["MRVL", "RGTI", "ZS", "MDB", "VEEVA", "VSCO", "TREE", "KGS", "LB", "FSM"]
         },
         "Thursday": {
-            "Before Open": ["VST", "NCLH", "GEO", "GTN", "VTRS", "VRNA", "TD", "MPW", "OPRA", "DQ", "JD", "CRBL", "KR", "BJ", "DCTH", "BTSH", "NINE", "BKSY", "HIPO", "M"],
-            "After Close": ["SOUN", "DELL", "RKLB", "ACHR", "CLOV", "SMR", "TMDX", "DUOL", "TLN", "OPEN", "ACVO", "BBAI", "COST", "GAP", "HPE", "SERV", "IOT", "COO", "CTSO", "VEL"]
+            "Before Open": ["JD", "CRBL", "KR", "BJ", "DCTH", "BTSH", "NINE", "BKSY", "HIPO", "M"],
+            "After Close": ["ACVO", "BBAI", "COST", "GAP", "HPE", "SERV", "IOT", "COO", "CTSO", "VEL"]
         },
         "Friday": {
-            "Before Open": ["FUBO", "WULF", "GTLS", "FLGT", "AES", "FRO", "BFLY", "AMR", "DIBS", "APLS", "GCO", "AQN", "WHF", "YPF", "INTT", "ADV", "ONCY"],
+            "Before Open": ["GCO", "AQN", "WHF", "YPF", "INTT", "ADV", "ONCY"],
             "After Close": []
         }
     }
@@ -120,14 +119,9 @@ def scrape_earnings_data(driver):
                     eps_estimate_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='earnings_per_share_forecast_next_fq']")
                     eps_estimate = eps_estimate_element.text.strip("USD") if eps_estimate_element else "N/A"
 
-                    reported_eps_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='earnings_per_share_fq']")
-                    reported_eps = reported_eps_element.text.strip("USD") if reported_eps_element else "N/A"
-
                     revenue_forecast_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='revenue_forecast_next_fq']")
                     revenue_forecast = revenue_forecast_element.text.strip("USD") if revenue_forecast_element else "N/A"
 
-                    reported_revenue_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='revenue_fq']")
-                    reported_revenue = reported_revenue_element.text.strip("USD") if reported_revenue_element else "N/A"
                     try:
                         time_reporting_element = row.find_element(By.CSS_SELECTOR, "[data-field-key='earnings_release_next_time']")
                         time_reporting = time_reporting_element.get_attribute("title").strip() if time_reporting_element else "N/A"
@@ -136,10 +130,9 @@ def scrape_earnings_data(driver):
 
                     earnings_data.append({
                         "Ticker": ticker,
+                        "report_date": datetime.datetime.now().date(),
                         "EPS Estimate": eps_estimate,
-                        "Reported EPS": reported_eps,
                         "Revenue Forecast": revenue_forecast,
-                        "Reported Revenue": reported_revenue,
                         "Time": time_reporting
                     })
 
@@ -159,8 +152,8 @@ def scrape_earnings_data(driver):
 
 def scrape_todays_earnings():
     """
-    Scrapes today's earnings
-    from TradingView.
+    Scrapes today's earnings from TradingView
+    and stores them in the database.
     """
     driver = open_earnings_calendar()
     if not driver:
@@ -168,7 +161,13 @@ def scrape_todays_earnings():
         return []
 
     try:
-        return scrape_earnings_data(driver)
+        earnings_data = scrape_earnings_data(driver)
+
+        if earnings_data:
+            store_earnings_data(earnings_data)
+            logging.info(f"Successfully stored {len(earnings_data)} earnings records in the database.")
+        
+        return earnings_data
 
     except Exception as e:
         logging.error(f"Error scraping earnings: {e}.")

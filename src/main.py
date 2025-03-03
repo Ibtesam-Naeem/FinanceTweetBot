@@ -6,11 +6,11 @@ from dotenv import load_dotenv
 
 from scraping.earnings_tradingview import scrape_todays_earnings
 from scraping.econ_scraper import (
-    open_earnings_calendar,
+    open_economic_calendar,  
     click_importance,
-    day,
-    scrape_economics_data,
+    scrape_economic_data,
 )
+
 from scraping.market_movers import open_premarket_page, premarket_data_scraper, premarket_data_scraper_two, premarket_data_scraper_three
 from scraping.sentiment import fear_index
 from scraping.closing_prices import get_market_data, get_weekly_data
@@ -99,14 +99,14 @@ def post_daily_econ_tweet():
     """
     Fetches economic data for tomorrow, formats the tweet,
     and sends it.
-    Scheduled for 8:00 PM.
+    Scheduled for 1:17 AM.
     """
-    driver = open_earnings_calendar()
+    driver = open_economic_calendar() 
     if driver:
-        click_importance(driver)
-        day(driver, "Tomorrow")
+        click_importance(driver)  
+        day(driver, "Tomorrow")   
         time.sleep(1)
-        econ_data_tomorrow = scrape_economics_data(driver)
+        econ_data_tomorrow = scrape_economic_data(driver) 
         tweet = econ_reminder_tomorrow(econ_data_tomorrow)
         send_tweet(tweet)
         driver.quit()
@@ -115,17 +115,18 @@ def post_weekly_econ_tweet():
     """
     Fetches economic data for this week, formats the tweet,
     and sends it.
-    Scheduled for 10:00 PM.
+    Scheduled for 1:17 AM (Sunday).
     """
-    driver = open_earnings_calendar()
+    driver = open_economic_calendar() 
     if driver:
-        click_importance(driver)
-        day(driver, "This Week")
+        click_importance(driver) 
+        day(driver, "This Week") 
         time.sleep(1)
-        econ_data_week = scrape_economics_data(driver)
+        econ_data_week = scrape_economic_data(driver)  
         tweet = econ_reminder_weekly(econ_data_week)
         send_tweet(tweet)
         driver.quit()
+
 
 def post_pre_market_gainers_tweet():
     """
