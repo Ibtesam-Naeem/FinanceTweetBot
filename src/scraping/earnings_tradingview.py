@@ -16,23 +16,23 @@ def earnings_to_be_tracked():
     """
     return {
         "Monday": {
-            "Before Open": ["DPZ", "BRK.B", "AZUL", "BCRX", "KSPI", "LINC", "SMMT", "WLK", "SSL", "CCO"],
+            "Before Open": ["DPZ", "BRK.B", "AZUL", "BCRX", "KSPI", "LINC", "SMMT", "WLK", "SSL", "CCO", "NOVA", "HUT", "PLUG", "TGTX", "SPHR", "AVDL", "BLFS", "BUR", "RC", "SGRY", "NUSCALE", "OKTRA", "ASTS", "GTLB", "ADMA", "GCT", "SENS", "MRC", "TDUP", "QSI"],
             "After Close": ["HIMS", "RIOT", "TEMP", "CLF", "ZM", "FANG", "CTRA", "O", "CHGG", "TCOM"]
         },
         "Tuesday": {
-            "Before Open": ["HD", "PLNT", "KDP", "DOCN", "ALLT", "CIFR", "BNS", "DNUT", "ITRI", "AMT"],
-            "After Close": ["CAVA", "AMC", "AXON", "FSLR", "LCID", "CART", "LMND", "WDAY", "ZETA", "INTU"]
+            "Before Open": ["HD", "PLNT", "KDP", "DOCN", "ALLT", "CIFR", "BNS", "DNUT", "ITRI", "AMT", "TGT", "BBY", "SE", "AZO", "PSFE", "EVGO", "ESPR", "GENI", "ONON", "NYAX"],
+            "After Close": ["CAVA", "AMC", "AXON", "FSLR", "LCID", "CART", "LMND", "WDAY", "ZETA", "INTU", "CRWD", "CRDO", "STEM", "JWN", "ORN", "BOX", "ROST", "KIDS", "CHPT", "NPCE"]
         },
         "Wednesday": {
-            "Before Open": ["LOW", "NRG", "AAP", "YOU", "BYD", "STLA", "IEP", "INVZ", "VLN", "UWMC"],
-            "After Close": ["NVDA", "SNOW", "AI", "CRM", "MARA", "JOBY", "IONQ", "ROOT", "KTOS", "NTNX"]
+            "Before Open": ["LOW", "NRG", "AAP", "YOU", "BYD", "STLA", "IEP", "INVZ", "VLN", "UWMC", "ANG", "FL", "OPFI", "THO", "SSYS", "RSKD", "EDIT", "REVG"],
+            "After Close": ["NVDA", "SNOW", "AI", "CRM", "MARA", "JOBY", "IONQ", "ROOT", "KTOS", "NTNX", "MRVL", "RGTI", "ZS", "MDB", "VEEVA", "VSCO", "TREE", "KGS", "LB", "FSM"]
         },
         "Thursday": {
-            "Before Open": ["VST", "NCLH", "GEO", "GTN", "VTRS", "VRNA", "TD", "MPW", "OPRA", "DQ"],
-            "After Close": ["SOUN", "DELL", "RKLB", "ACHR", "CLOV", "SMR", "TMDX", "DUOL", "TLN", "OPEN"]
+            "Before Open": ["VST", "NCLH", "GEO", "GTN", "VTRS", "VRNA", "TD", "MPW", "OPRA", "DQ", "JD", "CRBL", "KR", "BJ", "DCTH", "BTSH", "NINE", "BKSY", "HIPO", "M"],
+            "After Close": ["SOUN", "DELL", "RKLB", "ACHR", "CLOV", "SMR", "TMDX", "DUOL", "TLN", "OPEN", "ACVO", "BBAI", "COST", "GAP", "HPE", "SERV", "IOT", "COO", "CTSO", "VEL"]
         },
         "Friday": {
-            "Before Open": ["FUBO", "WULF", "GTLS", "FLGT", "AES", "FRO", "BFLY", "AMR", "DIBS", "APLS"],
+            "Before Open": ["FUBO", "WULF", "GTLS", "FLGT", "AES", "FRO", "BFLY", "AMR", "DIBS", "APLS", "GCO", "AQN", "WHF", "YPF", "INTT", "ADV", "ONCY"],
             "After Close": []
         }
     }
