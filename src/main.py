@@ -9,9 +9,10 @@ from scraping.econ_scraper import (
     open_economic_calendar,  
     click_importance,
     scrape_economic_data,
+    select_timeframe
 )
 
-from scraping.market_movers import open_premarket_page, premarket_data_scraper, premarket_data_scraper_two, premarket_data_scraper_three
+from scraping.market_movers import open_premarket_page, premarket_data_scraper
 from scraping.sentiment import fear_index
 from scraping.closing_prices import get_market_data, get_weekly_data
 from scraping.general_info import trading_holidays
@@ -25,7 +26,6 @@ from twitter.tweet_format import (
     week_high_52,
     week_low_52,
     all_time_high,
-    all_time_low,
     pre_market_gap,
     fear_sentiment,
     daily_market_summary,
@@ -97,36 +97,37 @@ def post_after_hours_earnings_tweet():
 
 def post_daily_econ_tweet():
     """
-    Fetches economic data for tomorrow, formats the tweet,
-    and sends it.
+    Fetches economic data for tomorrow, formats the tweet, and sends it.
     Scheduled for 1:17 AM.
     """
     driver = open_economic_calendar() 
     if driver:
         click_importance(driver)  
-        day(driver, "Tomorrow")   
+        select_timeframe(driver, "Tomorrow")
         time.sleep(1)
+        
         econ_data_tomorrow = scrape_economic_data(driver) 
         tweet = econ_reminder_tomorrow(econ_data_tomorrow)
         send_tweet(tweet)
-        driver.quit()
+    else:
+        logging.error("Failed to initialize driver for daily econ tweet.")
 
 def post_weekly_econ_tweet():
     """
-    Fetches economic data for this week, formats the tweet,
-    and sends it.
+    Fetches economic data for this week, formats the tweet, and sends it.
     Scheduled for 1:17 AM (Sunday).
     """
     driver = open_economic_calendar() 
     if driver:
         click_importance(driver) 
-        day(driver, "This Week") 
+        select_timeframe(driver, "This Week")  
         time.sleep(1)
+
         econ_data_week = scrape_economic_data(driver)  
         tweet = econ_reminder_weekly(econ_data_week)
         send_tweet(tweet)
-        driver.quit()
-
+    else:
+        logging.error("Failed to initialize driver for weekly econ tweet.")
 
 def post_pre_market_gainers_tweet():
     """
@@ -137,7 +138,7 @@ def post_pre_market_gainers_tweet():
         "https://www.tradingview.com/markets/stocks-usa/market-movers-pre-market-gainers/"
     )
     if driver:
-        gainers_data = premarket_data_scraper_two(driver)
+        gainers_data = premarket_data_scraper(driver, market_cap_column=10, min_market_cap=100_000_000)
         tweet = pre_market_gainer(gainers_data)
         send_tweet(tweet)
         driver.quit()
@@ -151,7 +152,7 @@ def post_pre_market_losers_tweet():
         "https://www.tradingview.com/markets/stocks-usa/market-movers-pre-market-losers/"
     )
     if driver:
-        losers_data = premarket_data_scraper_two(driver)
+        losers_data = premarket_data_scraper(driver, market_cap_column=10, min_market_cap=100_000_000)
         tweet = pre_market_losers(losers_data)
         send_tweet(tweet)
         driver.quit()
@@ -193,22 +194,8 @@ def post_all_time_high_tweet():
         "https://www.tradingview.com/markets/stocks-usa/market-movers-ath/"
     )
     if driver:
-        all_time_high_data = premarket_data_scraper(driver)
+        all_time_high_data = premarket_data_scraper(driver) 
         tweet = all_time_high(all_time_high_data)
-        send_tweet(tweet)
-        driver.quit()
-
-def post_all_time_low_tweet():
-    """
-    Fetches and sends the All-Time Lows tweet.
-    Scheduled for 3:51 PM.
-    """
-    driver = open_premarket_page(
-        "https://www.tradingview.com/markets/stocks-usa/market-movers-atl/"
-    )
-    if driver:
-        all_time_low_data = premarket_data_scraper_three(driver)
-        tweet = all_time_low(all_time_low_data)
         send_tweet(tweet)
         driver.quit()
 
@@ -292,15 +279,14 @@ if __name__ == "__main__":
     schedule.every().day.at("12:00").do(post_after_hours_earnings_tweet) # 12:00 PM (Noon)
 
     # Pre-Market Movements
-    schedule.every().day.at("09:00").do(post_pre_market_gainers_tweet)   # 9:00 AM
-    schedule.every().day.at("09:05").do(post_pre_market_losers_tweet)    # 9:05 AM
-    schedule.every().day.at("09:10").do(post_gap_tweet)                  # 9:10 AM
+    schedule.every().day.at("16:37").do(post_pre_market_gainers_tweet)   # 9:00 AM
+    schedule.every().day.at("16:37").do(post_pre_market_losers_tweet)    # 9:05 AM
+    schedule.every().day.at("16:37").do(post_gap_tweet)                  # 9:10 AM
 
     # Market Highs and Lows
-    schedule.every().day.at("14:45").do(post_week_high_52_tweet)         # 2:45 PM
-    schedule.every().day.at("14:45").do(post_week_low_52_tweet)          # 2:45 PM
-    schedule.every().day.at("15:00").do(post_all_time_high_tweet)        # 3:00 PM
-    schedule.every().day.at("15:00").do(post_all_time_low_tweet)         # 3:00 PM 
+    schedule.every().day.at("16:37").do(post_week_high_52_tweet)         # 2:45 PM
+    schedule.every().day.at("16:37").do(post_week_low_52_tweet)          # 2:45 PM
+    schedule.every().day.at("16:37").do(post_all_time_high_tweet)        # 3:00 PM
 
     # Economic Events
     schedule.every().day.at("06:00").do(post_daily_econ_tweet)           # 6:00 AM

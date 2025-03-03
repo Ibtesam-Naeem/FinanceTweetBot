@@ -128,20 +128,6 @@ def all_time_high(high_list):
 
     return tweet.strip()
 
-def all_time_low(low_list):
-    """
-    Formats the All-Time Lows tweet.
-    """
-    if not low_list:
-        return "No stocks reaching all-time lows today."
-
-    tweet = "All these stocks hit ALL TIME LOWS at some point today\n\n"
-
-    for stock in low_list[:10]:
-        tweet += f"- {stock['Ticker']}\n"
-     
-    return tweet.strip()
-
 def pre_market_gap(gap_list):
     """
     Fromats the pre-market Gap tweet

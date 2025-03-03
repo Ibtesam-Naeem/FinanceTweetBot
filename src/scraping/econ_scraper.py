@@ -51,6 +51,25 @@ def click_importance(driver):
     except Exception as e:
         logging.error(f"Failed to click Importance button: {e}")
 
+def select_timeframe(driver, timeframe):
+    """
+    Selects the specified timeframe (e.g., 'Tomorrow', 'This Week') on the economic calendar.
+    """
+    try:
+        logging.info(f"Selecting timeframe: {timeframe}")
+
+        timeframe_button = WebDriverWait(driver, 15).until(
+            EC.element_to_be_clickable((By.XPATH, f"//button[contains(text(), '{timeframe}')]"))
+        )
+        driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", timeframe_button)
+        time.sleep(1)
+        
+        driver.execute_script("arguments[0].click();", timeframe_button)
+        logging.info(f"Timeframe '{timeframe}' selected successfully.")
+        
+    except Exception as e:
+        logging.error(f"Failed to select timeframe '{timeframe}': {e}")
+
 def scrape_economic_data(driver):
     """
     Extracts the Economic Event data from TradingView.
