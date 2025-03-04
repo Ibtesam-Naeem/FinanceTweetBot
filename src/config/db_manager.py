@@ -1,6 +1,10 @@
+import os
 import psycopg2
+from dotenv import load_dotenv
 
-DB_URL = "postgresql://wealthuser:ahmadahmad123@localhost/wealthsimple"
+load_dotenv()
+
+DB_URL = os.getenv("DB_URL")
 
 def get_db_connection():
     return psycopg2.connect(DB_URL)
@@ -9,18 +13,22 @@ def store_earnings_data(data):
     conn = get_db_connection()
     cur = conn.cursor()
     
+    cur.execute("DROP TABLE IF EXISTS earnings_reports;")
+    
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS earnings_reports (
+        CREATE TABLE earnings_reports (
             id SERIAL PRIMARY KEY,
             ticker TEXT NOT NULL,
             report_date DATE NOT NULL,
             eps_estimate TEXT,
             revenue_forecast TEXT,
-            time TEXT NOT NULL,
-            UNIQUE (ticker, report_date, time)  -- Updated to include report_date
+            time TEXT,  -- Allows NULL
+            UNIQUE (ticker, report_date, time)  -- Include time in UNIQUE constraint
         )
     """)
     conn.commit()
+    cur.close()
+    conn.close()
     
     for record in data:
         cur.execute("""
@@ -28,8 +36,15 @@ def store_earnings_data(data):
             VALUES (%s, %s, %s, %s, %s)
             ON CONFLICT (ticker, report_date, time) DO UPDATE
             SET eps_estimate = EXCLUDED.eps_estimate,
-                revenue_forecast = EXCLUDED.revenue_forecast
-        """, (record["Ticker"], record["report_date"], record["EPS Estimate"], record["Revenue Forecast"], record["Time"]))
+                revenue_forecast = EXCLUDED.revenue_forecast,
+                time = COALESCE(EXCLUDED.time, earnings_reports.time)
+        """, (
+            record["Ticker"],
+            record["report_date"], 
+            record["EPS Estimate"],
+            record["Revenue Forecast"],
+            None if record["Time"] == "Unknown" else record["Time"] 
+        ))
     
     conn.commit()
     cur.close()
@@ -44,7 +59,7 @@ def store_economic_data(data):
             id SERIAL PRIMARY KEY,
             event TEXT NOT NULL,
             date DATE NOT NULL,
-            UNIQUE (event, date)  -- 
+            UNIQUE (event, date)
         )
     """)
     conn.commit()
@@ -140,8 +155,6 @@ def get_sp500_tickers():
     conn.close()
     
     return tickers
-
-from config.db_manager import get_db_connection
 
 def trading_holidays():
     """
