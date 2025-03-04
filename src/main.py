@@ -4,18 +4,17 @@ import schedule
 import tweepy
 from dotenv import load_dotenv
 
-from scraping.earnings_tradingview import scrape_todays_earnings
 from scraping.econ_scraper import (
     open_economic_calendar,  
     click_importance,
     scrape_economic_data,
     select_timeframe
 )
-
 from scraping.market_movers import open_premarket_page, premarket_data_scraper
 from scraping.sentiment import fear_index
 from scraping.closing_prices import get_market_data, get_weekly_data
 from scraping.general_info import trading_holidays
+from config.db_manager import get_todays_earnings
 from twitter.tweet_format import (
     daily_premkt_earnings_tweet,
     daily_afterhrs_earnings_tweet,
@@ -67,11 +66,10 @@ def send_tweet(tweet_text):
 
 def post_pre_market_earnings_tweet():
     """
-    Fetches earnings data, formats the Pre-Market tweet,
-    and sends it.
-    Scheduled for 4:00 AM.
+    Fetches earnings data from the database, formats the Pre-Market tweet,
+    and sends it. Scheduled for 4:00 AM.
     """
-    earnings_data = scrape_todays_earnings()
+    earnings_data = get_todays_earnings() 
     pre_market_earnings = [e for e in earnings_data if e["Time"] == "Before Open"]
 
     if pre_market_earnings:
@@ -82,11 +80,10 @@ def post_pre_market_earnings_tweet():
 
 def post_after_hours_earnings_tweet():
     """
-    Fetches earnings data, formats the After-Hours tweet,
-    and sends it.
-    Scheduled for 12:00 PM.
+    Fetches earnings data from the database, formats the After-Hours tweet,
+    and sends it. Scheduled for 12:00 PM.
     """
-    earnings_data = scrape_todays_earnings()
+    earnings_data = get_todays_earnings() 
     after_hours_earnings = [e for e in earnings_data if e["Time"] == "After Close"]
 
     if after_hours_earnings:
@@ -208,15 +205,10 @@ def post_gap_tweet():
         "https://www.tradingview.com/markets/stocks-usa/market-movers-pre-market-gappers/"
     )
     if driver:
-        gap_data = premarket_data_scraper(driver)
+        gap_data = premarket_data_scraper(driver, market_cap_column=6, min_market_cap=50_000_000)
         tweet = pre_market_gap(gap_data)
         send_tweet(tweet)
         driver.quit()
-
-def post_roaring_kitty_tweet():
-    """
-    Fetches and sends the roaring kitty tweet
-    """
 
 def post_fear_sentiment():
     """
@@ -267,7 +259,7 @@ def post_trading_holiday():
 
     if closing_dates:
         tweet = closures(closing_dates)
-        send_tweet()
+        send_tweet(tweet)
     else:
         logging.error("No Holiday Tomorrow")
 
@@ -290,7 +282,7 @@ if __name__ == "__main__":
 
     # Economic Events
     schedule.every().day.at("20:00").do(post_daily_econ_tweet)           # 8:00 PM
-    schedule.every().sunday.at("20:00").do(post_weekly_econ_tweet)       # 8:00 PM (Sunday)
+    schedule.every().day.at("05:14").do(post_weekly_econ_tweet)          # 8:00 PM (Sunday)
 
     # Main Loop
     while True:

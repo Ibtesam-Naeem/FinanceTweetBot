@@ -1,6 +1,7 @@
 import os
 import psycopg2
 from dotenv import load_dotenv
+from datetime import date 
 
 load_dotenv()
 
@@ -13,22 +14,18 @@ def store_earnings_data(data):
     conn = get_db_connection()
     cur = conn.cursor()
     
-    cur.execute("DROP TABLE IF EXISTS earnings_reports;")
-    
     cur.execute("""
-        CREATE TABLE earnings_reports (
+        CREATE TABLE IF NOT EXISTS earnings_reports (
             id SERIAL PRIMARY KEY,
             ticker TEXT NOT NULL,
             report_date DATE NOT NULL,
             eps_estimate TEXT,
             revenue_forecast TEXT,
-            time TEXT,  -- Allows NULL
-            UNIQUE (ticker, report_date, time)  -- Include time in UNIQUE constraint
+            time TEXT,
+            UNIQUE (ticker, report_date, time)
         )
     """)
     conn.commit()
-    cur.close()
-    conn.close()
     
     for record in data:
         cur.execute("""
@@ -40,15 +37,46 @@ def store_earnings_data(data):
                 time = COALESCE(EXCLUDED.time, earnings_reports.time)
         """, (
             record["Ticker"],
-            record["report_date"], 
+            record["report_date"],
             record["EPS Estimate"],
             record["Revenue Forecast"],
-            None if record["Time"] == "Unknown" else record["Time"] 
+            None if record["Time"] == "Unknown" else record["Time"]
         ))
     
     conn.commit()
     cur.close()
     conn.close()
+
+def get_todays_earnings():
+    """
+    Fetches earnings data for today from the earnings_reports table.
+    Returns a list of dictionaries matching the expected format.
+    """
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    today = date.today()
+    cur.execute("""
+        SELECT ticker, report_date, eps_estimate, revenue_forecast, time
+        FROM earnings_reports
+        WHERE report_date = %s;
+    """, (today,))
+    
+    rows = cur.fetchall()
+    earnings_data = [
+        {
+            "Ticker": row[0],
+            "report_date": row[1],  
+            "EPS Estimate": row[2],
+            "Revenue Forecast": row[3],
+            "Time": row[4] if row[4] else "Unknown"
+        }
+        for row in rows
+    ]
+    
+    cur.close()
+    conn.close()
+    return earnings_data
 
 def store_economic_data(data):
     conn = get_db_connection()
