@@ -49,7 +49,7 @@ def select_timeframe(driver, timeframe):
     """
     try:
         logging.info(f"Selecting timeframe: {timeframe}")
-        # Use a more flexible XPath; adjust if needed after testing
+    
         timeframe_button = WebDriverWait(driver, 15).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(., 'Tomorrow')]"))
         )
@@ -59,10 +59,10 @@ def select_timeframe(driver, timeframe):
         logging.info(f"Timeframe '{timeframe}' selected successfully.")
     except TimeoutException:
         logging.error(f"Timeout waiting for '{timeframe}' button; proceeding with default view.")
-        return  # Don’t crash, proceed with current view
+        return  
     except Exception as e:
         logging.error(f"Failed to select timeframe '{timeframe}': {e}")
-        return  # Don’t crash, proceed with current view
+        return 
 
 def scrape_economic_data(driver):
     """
