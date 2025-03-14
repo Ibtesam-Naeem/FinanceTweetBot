@@ -28,8 +28,6 @@ This separation of concerns allows for:
       ```
       Major companies reporting earnings today after the bell:
       - $AAPL --->
-        EPS estimate: $1.82  
-        Revenue estimate: $100B  
       ```
   - **Economic Events:**
     - Example:
@@ -105,6 +103,30 @@ This separation of concerns allows for:
 
 ---
 
+### **7. AI-Powered Market Sentiment Analysis**
+- **Machine Learning-based sentiment analysis of market news**
+- **Scheduled tweets at 11:00 AM and 3:00 PM**
+- **Features:**
+  - Sentiment classification (positive, neutral, negative)
+  - Market impact assessment
+  - AI-generated market signals
+- **Example:**
+  ```
+  📊 Market AI Analysis:
+
+  🟢 S&P 500 reaches new all-time high as tech stocks surge
+
+  AI Sentiment: Positive
+  Market Signal: Moderately bullish signal
+
+  Source: Market News
+  Time: 2023-03-10 15:30:45
+
+  #MarketAI #FinancialAnalysis #ML
+  ```
+
+---
+
 ## **Data Sources**
 - **FinancialSuite-Backend API:**
   - Provides all market data through a unified API
@@ -141,21 +163,59 @@ This separation of concerns allows for:
 ## **Project Structure**
 
 ```
-├── data/
-│   ├── cache/                       # Cached API responses if needed
+├── main.py                         # Centralized entry point for all functionality
+├── models/                         # Directory for trained ML models
+│   ├── market_sentiment_model.pkl  # Trained sentiment analysis model
+│   ├── market_sentiment_vectorizer.pkl # TF-IDF vectorizer for sentiment analysis
+├── logs/                           # Log files directory
 ├── src/
 │   ├── config/
-│   │   ├── api_client.py            # Handles API calls to the backend
-│   │   ├── logger.py                # Logging configuration
+│   │   ├── api_client.py           # Handles API calls to the backend
+│   │   ├── logger.py               # Logging configuration
 │   ├── twitter/
-│   │   ├── tweet_format.py          # Formats tweet content
-│   ├── main.py                      # Orchestrates workflows and scheduling
-├── requirements.txt                 # Python dependencies
-├── README.md                        # Project documentation
-├── .env                             # Environment variables (gitignored)
-├── .env.example                     # Example environment variables
-├── .gitignore                       # Git ignore file
+│   │   ├── tweet_format.py         # Formats tweet content
+│   ├── ml/
+│   │   ├── __init__.py             # ML module initialization
+│   │   ├── sentiment_analyzer.py   # Sentiment analysis using scikit-learn
+│   │   ├── market_sentiment_tweet.py # Generates market sentiment tweets
+├── requirements.txt                # Python dependencies
+├── README.md                       # Project documentation
+├── .env                            # Environment variables (gitignored)
+├── .gitignore                      # Git ignore file
 ```
+
+## **Centralized Approach**
+
+The project uses a centralized approach with a single `main.py` file that serves as the entry point for all functionality:
+
+1. **Setup Mode**: Creates necessary directories and downloads NLTK data
+   ```bash
+   python main.py --mode setup
+   ```
+
+2. **Train Mode**: Trains the sentiment analysis model with market-related text data
+   ```bash
+   python main.py --mode train
+   ```
+
+3. **Test Mode**: Tests the ML functionality by analyzing sample texts and generating a sample tweet
+   ```bash
+   python main.py --mode test
+   ```
+
+4. **Run Mode**: Runs the Twitter bot with scheduled tweets
+   ```bash
+   python main.py --mode run
+   ```
+
+5. **All Mode**: Runs all of the above in sequence
+   ```bash
+   python main.py --mode all
+   # or simply
+   python main.py
+   ```
+
+This centralized approach makes it easy to manage the project and ensures that all components work together seamlessly.
 
 ---
 
@@ -170,13 +230,15 @@ This separation of concerns allows for:
 
 ---
 
-## **Technologies Used**
+## **Technical Details**
 
-- **API Client:** `requests`
-- **Twitter API:** `tweepy`
-- **Scheduling:** `schedule`
-- **Hosting and Scheduling:** `AWS Lambda`, `AWS CloudWatch`
-- **Environment Management:** `python-dotenv`
+### **Technologies Used**
+- **Python 3.9+**
+- **Tweepy**: Twitter API client
+- **Schedule**: Task scheduling
+- **Requests**: HTTP client for API calls
+- **scikit-learn**: Machine learning library for sentiment analysis
+- **NLTK**: Natural language processing for text preprocessing
 
 ---
 
@@ -189,15 +251,14 @@ This separation of concerns allows for:
 
 2. Install dependencies:
    ```bash
+   python -m venv venv
+   source venv/bin/activate  # On macOS/Linux
+   # or
+   venv\Scripts\activate  # On Windows
    pip install -r requirements.txt
    ```
 
-3. Run the cleanup script to remove unnecessary files:
-   ```bash
-   python cleanup.py
-   ```
-
-4. Configure environment variables in `.env`:
+3. Configure environment variables in `.env`:
    ```env
    # Twitter API Credentials
    API_KEY=your_twitter_api_key
@@ -210,24 +271,31 @@ This separation of concerns allows for:
    BACKEND_URL=http://localhost:8000  # Change this to your backend URL
    ```
 
-5. Make sure the FinancialSuite-Backend is running:
+4. Run the setup to create necessary directories and download NLTK data:
    ```bash
-   # In the FinancialSuite-Backend directory
-   python src/main.py --mode both
+   python main.py --mode setup
    ```
 
-6. Run the Twitter bot:
+5. Train the sentiment analysis model:
    ```bash
-   python src/main.py
+   python main.py --mode train
    ```
 
-7. Deploy to AWS Lambda (optional):
+6. Test the ML functionality:
    ```bash
-   # Package the application
-   zip -r twitter-bot.zip .
-   
-   # Upload to AWS Lambda
-   aws lambda update-function-code --function-name YourLambdaFunction --zip-file fileb://twitter-bot.zip
+   python main.py --mode test
+   ```
+
+7. Run the Twitter bot:
+   ```bash
+   python main.py --mode run
+   ```
+
+8. Or do all of the above in one command:
+   ```bash
+   python main.py --mode all
+   # or simply
+   python main.py
    ```
 
 ---
