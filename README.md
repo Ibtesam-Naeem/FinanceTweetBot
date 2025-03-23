@@ -15,7 +15,6 @@ This Twitter bot is part of the **FinancialSuite Ecosystem**, designed for **mod
 FinancialSuite Ecosystem
 ├── FinancialSuite-Backend: Collects & processes financial data
 ├── FinancialSuite-TwitterBot: Formats and tweets the data automatically
-└── SEC/Polygon API integrations: Provide real-time and historical financial data
 ```
 
 ---
